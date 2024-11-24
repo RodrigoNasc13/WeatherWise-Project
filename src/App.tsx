@@ -11,6 +11,13 @@ import { weatherAPI, cscAPI } from './config/api'
 import type { ContryCSC } from './models/countries'
 import type { StateCSC } from './models/states'
 import type { CityCSC } from './models/cities'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './components/card'
 
 export function App() {
   const [weatherData, setWeatherData] = useState(null)
@@ -69,13 +76,13 @@ export function App() {
 
   return (
     <div className="flex h-screen flex-col justify-center gap-8">
-      <div className="mx-auto rounded-lg border p-6 shadow">
-        <div className="flex gap-8">
-          <div>
-            <p className="font-bold text-3xl">Weather Dashboard</p>
-            <p className="text-sm text-zinc-500">Tuesday, October 29, 2024</p>
-          </div>
-          <div className="flex gap-4">
+      <Card className="mx-auto">
+        <CardHeader>
+          <div className="flex items-center gap-6">
+            <CardTitle>
+              <p>Weather Dashboard</p>
+            </CardTitle>
+
             <Select onValueChange={value => getStates(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a country" />
@@ -126,29 +133,73 @@ export function App() {
               </SelectContent>
             </Select>
           </div>
-        </div>
+
+          <CardDescription>Tuesday, October 29, 2024</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between">
+            <div className="flex items-center gap-2">
+              <Cloud className="text-zinc-500" />
+              <span className="font-bold text-4xl">62°F</span>
+            </div>
+            <div className="flex flex-col items-end">
+              <p className="font-bold text-xl">Cloudy</p>
+              <p className="text-sm text-zinc-500">Humidity: 70%</p>
+              <p className="text-sm text-zinc-500">Wind: 12 mph</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="mx-auto flex w-[32rem] flex-col gap-4">
+        <span className="text-center font-bold text-2xl">5-Day Forecast</span>
+
         <div className="flex justify-between">
-          <div className="flex items-center gap-2">
-            <Cloud className="text-zinc-500" />
-            <span className="font-bold text-4xl">62°F</span>
-          </div>
-          <div className="flex flex-col items-end">
-            <p className="font-bold text-xl">Cloudy</p>
-            <p className="text-sm text-zinc-500">Humidity: 70%</p>
-            <p className="text-sm text-zinc-500">Wind: 12 mph</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto flex w-[922px] flex-col gap-4">
-        <span className="font-bold text-2xl">5-Day Forecast</span>
-
-        <div className="flex">
-          <div className="rounded-lg border p-4">
-            <span>Mon</span>
-            <Sun className="text-yellow-400" />
-            <span>75°F</span>
-          </div>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-semibold">Mon</p>
+                <Sun className="text-yellow-400" />
+                <p>75°F</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-semibold">Mon</p>
+                <Sun className="text-yellow-400" />
+                <p>75°F</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-semibold">Mon</p>
+                <Sun className="text-yellow-400" />
+                <p>75°F</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-semibold">Mon</p>
+                <Sun className="text-yellow-400" />
+                <p>75°F</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-semibold">Mon</p>
+                <Sun className="text-yellow-400" />
+                <p>75°F</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

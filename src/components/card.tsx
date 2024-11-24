@@ -35,7 +35,7 @@ const CardTitle = React.forwardRef<
   <div
     ref={ref}
     className={twMerge(
-      'font-semibold text-2xl leading-none tracking-tight',
+      'font-bold text-3xl leading-none tracking-tight',
       className
     )}
     {...props}
@@ -55,7 +55,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={twMerge('p-6 pt-0', className)} {...props} />
+  <div ref={ref} className={twMerge('px-6 py-4', className)} {...props} />
 ))
 CardContent.displayName = 'CardContent'
 
