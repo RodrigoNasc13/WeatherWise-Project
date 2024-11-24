@@ -1,4 +1,4 @@
-import { ChevronDown, Cloud } from 'lucide-react'
+import { Cloud, Sun } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   Select,
@@ -7,29 +7,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from './components/select'
-import { universalAPI, weatherAPI } from './config/api'
-import type { Country } from './models/countries'
-import type { State } from './models/states'
-import type { City } from './models/cities'
+import { weatherAPI, cscAPI } from './config/api'
+import type { ContryCSC } from './models/countries'
+import type { StateCSC } from './models/states'
+import type { CityCSC } from './models/cities'
 
 export function App() {
   const [weatherData, setWeatherData] = useState(null)
   const [locationQuery, setLocationQuery] = useState('')
-  const [countries, setCountries] = useState<Country[] | null>(null)
-  const [states, setStates] = useState<State[] | null>(null)
-  const [cities, setCities] = useState<City[] | null>(null)
+  const [countries, setCountries] = useState<ContryCSC[] | null>(null)
+  const [states, setStates] = useState<StateCSC[] | null>(null)
+  const [cities, setCities] = useState<CityCSC[] | null>(null)
+  const [country, setCountry] = useState('')
 
   const getStates = useCallback(async (country: string) => {
-    await universalAPI.get<State[]>(`states/${country}`).then(response => {
-      setStates(response.data)
-    })
+    setStates(null)
+    setCities(null)
+    await cscAPI
+      .get<StateCSC[]>(`countries/${country}/states`)
+      .then(response => {
+        setStates(response.data)
+        setCountry(country)
+      })
   }, [])
 
-  const getCities = useCallback(async (state: string) => {
-    await universalAPI.get<City[]>(`cities/${state}`).then(response => {
-      setCities(response.data)
-    })
-  }, [])
+  const getCities = useCallback(
+    async (state: string) => {
+      setCities(null)
+      await cscAPI
+        .get<CityCSC[]>(`countries/${country}/states/${state}/cities`)
+        .then(response => {
+          setCities(response.data)
+        })
+    },
+    [country]
+  )
 
   useEffect(() => {
     weatherAPI
@@ -43,9 +55,11 @@ export function App() {
   }, [locationQuery])
 
   useEffect(() => {
-    universalAPI
-      .get<Country[]>('countries')
-      .then(response => setCountries(response.data))
+    cscAPI
+      .get<ContryCSC[]>('countries')
+      .then(response => {
+        setCountries(response.data)
+      })
       .catch(error => console.log(error))
   }, [])
 
@@ -54,8 +68,8 @@ export function App() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="rounded-lg border p-6 shadow">
+    <div className="flex h-screen flex-col justify-center gap-8">
+      <div className="mx-auto rounded-lg border p-6 shadow">
         <div className="flex gap-8">
           <div>
             <p className="font-bold text-3xl">Weather Dashboard</p>
@@ -69,18 +83,17 @@ export function App() {
 
               <SelectContent>
                 {countries.map(country => (
-                  <SelectItem
-                    key={country.country_short_name}
-                    value={country.country_name}
-                  >
-                    {country.country_short_name} - {country.country_name}
+                  <SelectItem key={country.id} value={country.iso2}>
+                    {country.iso2} - {country.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select
-              onValueChange={value => getCities(value)}
+              onValueChange={value => {
+                getCities(value)
+              }}
               disabled={!states}
             >
               <SelectTrigger>
@@ -89,22 +102,25 @@ export function App() {
 
               <SelectContent>
                 {states?.map(state => (
-                  <SelectItem key={state.state_name} value={state.state_name}>
-                    {state.state_name}
+                  <SelectItem key={state.id} value={state.iso2}>
+                    {state.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select disabled={!cities}>
+            <Select
+              onValueChange={value => setLocationQuery(value)}
+              disabled={!cities}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a City" />
               </SelectTrigger>
 
               <SelectContent>
                 {cities?.map(town => (
-                  <SelectItem key={town.city_name} value={town.city_name}>
-                    {town.city_name}
+                  <SelectItem key={town.id} value={town.name}>
+                    {town.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -120,6 +136,18 @@ export function App() {
             <p className="font-bold text-xl">Cloudy</p>
             <p className="text-sm text-zinc-500">Humidity: 70%</p>
             <p className="text-sm text-zinc-500">Wind: 12 mph</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto flex w-[922px] flex-col gap-4">
+        <span className="font-bold text-2xl">5-Day Forecast</span>
+
+        <div className="flex">
+          <div className="rounded-lg border p-4">
+            <span>Mon</span>
+            <Sun className="text-yellow-400" />
+            <span>75°F</span>
           </div>
         </div>
       </div>

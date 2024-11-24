@@ -7,15 +7,11 @@ const weatherAPI = axios.create({
   },
 })
 
-const universalAPI = axios.create({
-  baseURL: import.meta.env.VITE_UNIVERSAL_BASE_URL,
+const cscAPI = axios.create({
+  baseURL: import.meta.env.VITE_CSC_BASE_URL,
+  headers: {
+    'X-CSCAPI-KEY': import.meta.env.VITE_CSC_API_KEY,
+  },
 })
 
-universalAPI.interceptors.request.use(config => {
-  config.headers.Accept = 'application/json'
-  config.headers.Authorization = `Bearer ${import.meta.env.VITE_UNIVERSAL_API_KEY}`
-
-  return config
-})
-
-export { weatherAPI, universalAPI }
+export { weatherAPI, cscAPI }

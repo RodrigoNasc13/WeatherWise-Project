@@ -1,5 +1,11 @@
-export interface Country {
-  country_name: string
-  country_short_name: string
-  country_phone_code: number
+export interface ContryCSC {
+  id: number
+  name: string
+  iso2: string
+  iso3: string
+  phonecode: string
+  capital: string
+  currency: string
+  native: string
+  emoji: string
 }
