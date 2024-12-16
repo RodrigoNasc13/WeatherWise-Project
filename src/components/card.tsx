@@ -7,10 +7,7 @@ const Card = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={twMerge(
-      'rounded-lg border bg-card text-card-foreground shadow-sm',
-      className
-    )}
+    className={twMerge('rounded-lg border shadow-sm', className)}
     {...props}
   />
 ))
@@ -22,7 +19,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={twMerge('flex flex-col space-y-1.5 p-6', className)}
+    className={twMerge('flex flex-col p-6', className)}
     {...props}
   />
 ))
