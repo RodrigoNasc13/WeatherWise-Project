@@ -71,6 +71,7 @@ export function App() {
   )
 
   const getStates = useCallback(async (country: string) => {
+    setWeatherData(null)
     setStates(null)
     setCities(null)
     await cscAPI
@@ -83,6 +84,7 @@ export function App() {
 
   const getCities = useCallback(
     async (state: string) => {
+      setWeatherData(null)
       setCities(null)
       await cscAPI
         .get<CityCSC[]>(`countries/${country}/states/${state}/cities`)
@@ -241,7 +243,7 @@ export function App() {
 
       <div className="mx-auto flex flex-col gap-6">
         {isLocationFilled && (
-        <span className="text-center font-bold text-2xl">5-Day Forecast</span>
+          <span className="text-center font-bold text-2xl">5-Day Forecast</span>
         )}
         <div className="flex flex-wrap justify-center gap-4 2xl:gap-12">
           {weatherData?.timelines.daily.slice(1).map(({ values, time }) => {
@@ -250,14 +252,14 @@ export function App() {
             })
             return (
               <Card key={time}>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
+                <CardContent>
+                  <div className="flex flex-col items-center gap-1">
                     <p className="font-semibold">{cardDate}</p>
                     {getWeatherIcon(values)}
                     <p>{Math.trunc(values.temperatureAvg)}ºC</p>
-              </div>
-            </CardContent>
-          </Card>
+                  </div>
+                </CardContent>
+              </Card>
             )
           })}
 
@@ -268,7 +270,7 @@ export function App() {
               <Skeleton className="h-28 w-20" />
               <Skeleton className="h-28 w-20" />
               <Skeleton className="h-28 w-20" />
-              </div>
+            </div>
           )}
         </div>
       </div>
