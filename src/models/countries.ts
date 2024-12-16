@@ -1,4 +1,4 @@
-export interface ContryCSC {
+export interface CountryCSC {
   id: number
   name: string
   iso2: string
