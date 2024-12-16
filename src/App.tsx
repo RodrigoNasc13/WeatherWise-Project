@@ -1,4 +1,4 @@
-import { Cloud, Sun } from 'lucide-react'
+import { Cloud, CloudRain, LoaderCircle, Sun } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   Select,
@@ -8,24 +8,67 @@ import {
   SelectValue,
 } from './components/select'
 import { weatherAPI, cscAPI } from './config/api'
-import type { ContryCSC } from './models/countries'
+import type { CountryCSC } from './models/countries'
 import type { StateCSC } from './models/states'
 import type { CityCSC } from './models/cities'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from './components/card'
+import type { WeatherData } from './models/weather'
+import type { WeatherCondition } from './models/weather_condition'
+import { Card, CardContent, CardHeader } from './components/card'
+import { Skeleton } from './components/skeleton'
 
 export function App() {
-  const [weatherData, setWeatherData] = useState(null)
-  const [locationQuery, setLocationQuery] = useState('')
-  const [countries, setCountries] = useState<ContryCSC[] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
+  const [countries, setCountries] = useState<CountryCSC[] | null>(null)
   const [states, setStates] = useState<StateCSC[] | null>(null)
   const [cities, setCities] = useState<CityCSC[] | null>(null)
   const [country, setCountry] = useState('')
+
+  const weatherIconMap: Record<WeatherCondition, JSX.Element> = {
+    'heavy rain': <CloudRain className="h-6 w-6 text-blue-400" />,
+    'light rain': <CloudRain className="h-6 w-6 text-blue-300" />,
+    cloudy: <Cloud className="h-6 w-6 text-gray-600" />,
+    'partly cloudy': <Cloud className="h-6 w-6 text-gray-400" />,
+    sunny: <Sun className="h-6 w-6 text-yellow-400" />,
+    undefined: <div />,
+  }
+
+  const determineCondition = useCallback(
+    (
+      values: WeatherData['timelines']['daily'][0]['values']
+    ): WeatherCondition => {
+      const {
+        cloudCoverAvg,
+        precipitationProbabilityAvg,
+        rainIntensityAvg,
+        temperatureAvg,
+      } = values
+
+      if (precipitationProbabilityAvg > 50) {
+        return rainIntensityAvg > 2 ? 'heavy rain' : 'light rain'
+      }
+      if (cloudCoverAvg > 70) {
+        return 'cloudy'
+      }
+      if (cloudCoverAvg > 30) {
+        return 'partly cloudy'
+      }
+      if (temperatureAvg > 25) {
+        return 'sunny'
+      }
+
+      return 'undefined'
+    },
+    []
+  )
+
+  const getWeatherIcon = useCallback(
+    (values: WeatherData['timelines']['daily'][0]['values']) => {
+      const condition = determineCondition(values)
+      return weatherIconMap[condition]
+    },
+    [determineCondition]
+  )
 
   const getStates = useCallback(async (country: string) => {
     setStates(null)
@@ -50,20 +93,30 @@ export function App() {
     [country]
   )
 
-  useEffect(() => {
-    weatherAPI
-      .get('current', {
+  const getWeather = useCallback(async (location: string) => {
+    setIsLoading(true)
+    setWeatherData(null)
+
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    await weatherAPI
+      .get<WeatherData>('forecast', {
         params: {
-          query: locationQuery,
+          timesteps: 'daily',
+          location: location,
+          apikey: import.meta.env.VITE_TOMORROWIO_API_KEY,
         },
       })
-      .then(response => setWeatherData(response.data))
+      .then(response => {
+        setWeatherData(response.data)
+      })
       .catch(error => console.log(error))
-  }, [locationQuery])
+      .finally(() => setIsLoading(false))
+  }, [])
 
   useEffect(() => {
     cscAPI
-      .get<ContryCSC[]>('countries')
+      .get<CountryCSC[]>('countries')
       .then(response => {
         setCountries(response.data)
       })
