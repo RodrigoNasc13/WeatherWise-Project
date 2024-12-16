@@ -127,15 +127,26 @@ export function App() {
     return
   }
 
-  return (
-    <div className="flex h-screen flex-col justify-center gap-8">
-      <Card className="mx-auto">
-        <CardHeader>
-          <div className="flex items-center gap-6">
-            <CardTitle>
-              <p>Weather Dashboard</p>
-            </CardTitle>
+  const completeDate = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
+  const currentWeather = weatherData?.timelines.daily[0].values
+
+  const isLocationFilled = getWeather !== null
+
+  return (
+    <div className="flex flex-col justify-center gap-8 px-10 py-4 xl:h-screen xl:px-60 2xl:px-96">
+      <div className="text-center xl:flex xl:items-center xl:justify-between">
+        <h1 className="font-bold text-3xl">Weather Dashboard</h1>
+        <span>Please select a place</span>
+      </div>
+      <Card className="w-full">
+        <CardHeader className="flex flex-col items-center justify-between gap-6 xl:flex-row">
+          <div className="flex w-full flex-col items-center gap-6 *:w-full xl:flex-row 2xl:*:w-auto">
             <Select onValueChange={value => getStates(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a country" />
@@ -170,7 +181,9 @@ export function App() {
             </Select>
 
             <Select
-              onValueChange={value => setLocationQuery(value)}
+              onValueChange={value => {
+                getWeather(value)
+              }}
               disabled={!cities}
             >
               <SelectTrigger>
@@ -187,72 +200,76 @@ export function App() {
             </Select>
           </div>
 
-          <CardDescription>Tuesday, October 29, 2024</CardDescription>
+          <p className="xl:text-nowrap">{completeDate}</p>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between">
+          <div className="flex flex-col items-center gap-2 sm:flex-row xl:justify-between">
             <div className="flex items-center gap-2">
-              <Cloud className="text-zinc-500" />
-              <span className="font-bold text-4xl">62°F</span>
+              {currentWeather && getWeatherIcon(currentWeather)}
+              <div>
+                {isLoading && <LoaderCircle className="size-4 animate-spin" />}
+                {currentWeather && !isLoading && (
+                  <span className="font-bold text-4xl">
+                    {Math.trunc(currentWeather.temperatureAvg)}ºC
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex flex-col items-end">
-              <p className="font-bold text-xl">Cloudy</p>
-              <p className="text-sm text-zinc-500">Humidity: 70%</p>
-              <p className="text-sm text-zinc-500">Wind: 12 mph</p>
+            <div className="flex flex-col text-center xl:items-end">
+              <p className="font-bold text-xl">
+                {currentWeather
+                  ? determineCondition(currentWeather)
+                  : isLoading && (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    )}
+              </p>
+              {currentWeather && (
+                <>
+                  <div className="text-sm text-zinc-500">
+                    Humidity:
+                    <span> {Math.trunc(currentWeather.humidityAvg)}%</span>
+                  </div>
+                  <p className="text-sm text-zinc-500">
+                    Wind: {currentWeather?.windSpeedAvg} mph
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="mx-auto flex w-[32rem] flex-col gap-4">
+      <div className="mx-auto flex flex-col gap-6">
+        {isLocationFilled && (
         <span className="text-center font-bold text-2xl">5-Day Forecast</span>
+        )}
+        <div className="flex flex-wrap justify-center gap-4 2xl:gap-12">
+          {weatherData?.timelines.daily.slice(1).map(({ values, time }) => {
+            const cardDate = new Date(time).toLocaleDateString('pt-BR', {
+              weekday: 'short',
+            })
+            return (
+              <Card key={time}>
+            <CardContent>
+              <div className="flex flex-col items-center gap-1">
+                    <p className="font-semibold">{cardDate}</p>
+                    {getWeatherIcon(values)}
+                    <p>{Math.trunc(values.temperatureAvg)}ºC</p>
+              </div>
+            </CardContent>
+          </Card>
+            )
+          })}
 
-        <div className="flex justify-between">
-          <Card>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-semibold">Mon</p>
-                <Sun className="text-yellow-400" />
-                <p>75°F</p>
+          {isLoading && (
+            <div className="flex flex-wrap justify-center gap-4 2xl:gap-12">
+              <Skeleton className="h-28 w-20" />
+              <Skeleton className="h-28 w-20" />
+              <Skeleton className="h-28 w-20" />
+              <Skeleton className="h-28 w-20" />
+              <Skeleton className="h-28 w-20" />
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-semibold">Mon</p>
-                <Sun className="text-yellow-400" />
-                <p>75°F</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-semibold">Mon</p>
-                <Sun className="text-yellow-400" />
-                <p>75°F</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-semibold">Mon</p>
-                <Sun className="text-yellow-400" />
-                <p>75°F</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <div className="flex flex-col items-center gap-1">
-                <p className="font-semibold">Mon</p>
-                <Sun className="text-yellow-400" />
-                <p>75°F</p>
-              </div>
-            </CardContent>
-          </Card>
+          )}
         </div>
       </div>
     </div>
