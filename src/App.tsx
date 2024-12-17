@@ -98,8 +98,8 @@ export function App() {
       .get<StateCSC[]>(`countries/${country}/states`)
       .then(response => {
         if (response.data.length > 0) {
-        setStates(response.data)
-        setCountry(country)
+          setStates(response.data)
+          setCountry(country)
           return
         }
         toast.warning('Unable to load these states')
@@ -115,7 +115,7 @@ export function App() {
         .get<CityCSC[]>(`countries/${country}/states/${state}/cities`)
         .then(response => {
           if (response.data.length > 1) {
-          setCities(response.data)
+            setCities(response.data)
             return
           }
 
@@ -158,10 +158,6 @@ export function App() {
       .catch(() => toast.error('Unable to get countries'))
   }, [])
 
-  if (!countries) {
-    return
-  }
-
   const completeDate = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     year: 'numeric',
@@ -169,12 +165,16 @@ export function App() {
     day: 'numeric',
   })
 
+  if (!countries) {
+    return
+  }
+
   const currentWeather = weatherData?.timelines.daily[0].values
 
   const isLocationFilled = getWeather !== null
 
   return (
-    <div className="flex flex-col justify-center gap-8 px-10 py-4 xl:h-screen xl:px-60 2xl:px-96">
+    <div className="flex min-h-screen flex-col gap-8 px-10 py-4 md:justify-center md:px-40 xl:px-60 2xl:px-96">
       <div className="text-center xl:flex xl:items-center xl:justify-between">
         <h1 className="font-bold text-3xl">Weather Dashboard</h1>
         <span>Please select a place</span>
@@ -238,7 +238,7 @@ export function App() {
           <p className="xl:text-nowrap">{completeDate}</p>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center gap-2 sm:flex-row xl:justify-between">
+          <div className="flex flex-col items-center gap-2 sm:flex-row md:justify-between">
             <div className="flex items-center gap-2">
               {currentWeather && getWeatherIcon(currentWeather)}
               <div>
