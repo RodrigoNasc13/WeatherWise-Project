@@ -4,4 +4,6 @@ export type WeatherCondition =
   | 'cloudy'
   | 'partly cloudy'
   | 'sunny'
-  | 'undefined'
+  | 'freezing'
+  | 'snowy'
+  | ''

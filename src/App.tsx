@@ -1,4 +1,12 @@
-import { Cloud, CloudRain, LoaderCircle, Sun } from 'lucide-react'
+import {
+  Cloud,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  LoaderCircle,
+  Sun,
+  ThermometerSnowflake,
+} from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   Select,
@@ -30,20 +38,31 @@ export function App() {
     cloudy: <Cloud className="h-6 w-6 text-gray-600" />,
     'partly cloudy': <Cloud className="h-6 w-6 text-gray-400" />,
     sunny: <Sun className="h-6 w-6 text-yellow-400" />,
-    undefined: <div />,
+    snowy: <CloudSnow className="h-6 w-6 text-blue-200" />,
+    freezing: <ThermometerSnowflake className="h-6 w-6 text-blue-500" />,
+    '': <CloudSun className="h-6 w-6 text-gray-400" />,
   }
 
   const determineCondition = useCallback(
     (
-      values: WeatherData['timelines']['daily'][0]['values']
+      values?: WeatherData['timelines']['daily'][0]['values']
     ): WeatherCondition => {
+      if (!values) return ''
+
       const {
         cloudCoverAvg,
         precipitationProbabilityAvg,
         rainIntensityAvg,
         temperatureAvg,
+        snowAccumulationAvg,
       } = values
 
+      if (temperatureAvg <= 0 || snowAccumulationAvg > 0) {
+        return 'snowy'
+      }
+      if (temperatureAvg <= 10) {
+        return 'freezing'
+      }
       if (precipitationProbabilityAvg > 50) {
         return rainIntensityAvg > 2 ? 'heavy rain' : 'light rain'
       }
@@ -57,7 +76,7 @@ export function App() {
         return 'sunny'
       }
 
-      return 'undefined'
+      return ''
     },
     []
   )
