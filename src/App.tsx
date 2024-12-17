@@ -23,6 +23,7 @@ import type { WeatherData } from './models/weather'
 import type { WeatherCondition } from './models/weather_condition'
 import { Card, CardContent, CardHeader } from './components/card'
 import { Skeleton } from './components/skeleton'
+import { toast, Toaster } from 'sonner'
 
 export function App() {
   const [isLoading, setIsLoading] = useState(false)
@@ -96,9 +97,14 @@ export function App() {
     await cscAPI
       .get<StateCSC[]>(`countries/${country}/states`)
       .then(response => {
+        if (response.data.length > 0) {
         setStates(response.data)
         setCountry(country)
+          return
+        }
+        toast.warning('Unable to load these states')
       })
+      .catch(() => toast.error('Unable to get states'))
   }, [])
 
   const getCities = useCallback(
@@ -108,8 +114,14 @@ export function App() {
       await cscAPI
         .get<CityCSC[]>(`countries/${country}/states/${state}/cities`)
         .then(response => {
+          if (response.data.length > 1) {
           setCities(response.data)
+            return
+          }
+
+          toast.warning('Unable to load these cities')
         })
+        .catch(() => toast.error('Unable to get cities'))
     },
     [country]
   )
@@ -131,7 +143,9 @@ export function App() {
       .then(response => {
         setWeatherData(response.data)
       })
-      .catch(error => console.log(error))
+      .catch(() =>
+        toast.error('Unable to capture the weather of this location')
+      )
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -141,7 +155,7 @@ export function App() {
       .then(response => {
         setCountries(response.data)
       })
-      .catch(error => console.log(error))
+      .catch(() => toast.error('Unable to get countries'))
   }, [])
 
   if (!countries) {
@@ -293,6 +307,8 @@ export function App() {
           )}
         </div>
       </div>
+
+      <Toaster position="top-right" expand richColors />
     </div>
   )
 }
