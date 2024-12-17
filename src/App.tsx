@@ -298,11 +298,10 @@ export function App() {
 
           {isLoading && (
             <div className="flex flex-wrap justify-center gap-4 2xl:gap-12">
-              <Skeleton className="h-28 w-20" />
-              <Skeleton className="h-28 w-20" />
-              <Skeleton className="h-28 w-20" />
-              <Skeleton className="h-28 w-20" />
-              <Skeleton className="h-28 w-20" />
+              {Array.from({ length: 5 }).map((_, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: <I want to do a skeleton mapping so that I don't have code repetition.>
+                <Skeleton key={index} className="h-28 w-20" />
+              ))}
             </div>
           )}
         </div>
