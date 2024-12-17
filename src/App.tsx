@@ -177,7 +177,8 @@ export function App() {
     <div className="flex min-h-screen flex-col gap-8 px-10 py-4 md:justify-center md:px-40 xl:px-60 2xl:px-96">
       <div className="text-center xl:flex xl:items-center xl:justify-between">
         <h1 className="font-bold text-3xl">Weather Dashboard</h1>
-        <span>Please select a place</span>
+
+        {!weatherData && <span>Please select a place</span>}
       </div>
       <Card className="w-full">
         <CardHeader className="flex flex-col items-center justify-between gap-6 xl:flex-row">
